@@ -1,0 +1,1 @@
+# Mini File Logger (for Swift)
