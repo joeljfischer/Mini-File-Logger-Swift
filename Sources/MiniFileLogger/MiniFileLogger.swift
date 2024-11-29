@@ -1,9 +1,6 @@
-// The Swift Programming Language
-// https://docs.swift.org/swift-book
-
 import Foundation
 
-public struct FileLogger {
+open class FileLogger {
     /// Maximum file size of a log in kilobytes
     public let maxFileSize: UInt64
 
@@ -27,10 +24,8 @@ public struct FileLogger {
         directory.path(percentEncoded: false)
     }
 
-    public nonisolated static let defaultDirectoryURL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!.appendingPathComponent("logs", isDirectory: true)
-
     public init(
-        directoryURL: URL = Self.defaultDirectoryURL,
+        directoryURL: URL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!.appendingPathComponent("logs", isDirectory: true),
         fileName: String = "log",
         maxFileCount: Int = 4,
         maxFileSize: UInt64 = 1024 * 5,
