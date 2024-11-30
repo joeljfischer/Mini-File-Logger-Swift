@@ -55,6 +55,7 @@ open class FileLogger {
         self.dateFormat = dateFormat
         self.timeFormat = timeFormat
         self.isDisabled = isDisabled
+        // TODO: Add an option to print or log to OSLog automatically
 
         createDirectoryIfNeeded()
     }
@@ -70,7 +71,7 @@ open class FileLogger {
     }
 
     /// Write a log with a given message, level, and subsystem / category
-    public func writeLog(_ message: String, level: Level, subsystem: String, category: String) {
+    public func writeLog(_ message: MiniFileLog, level: Level, subsystem: String, category: String) {
         let logURL = directory.appendingPathComponent("\(baseFileName).log")
         if !FileManager.default.fileExists(atPath: logURL.path(percentEncoded: false)) { setup() }
 

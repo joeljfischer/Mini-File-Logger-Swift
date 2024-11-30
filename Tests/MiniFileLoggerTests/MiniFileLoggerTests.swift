@@ -1,3 +1,10 @@
+//
+//  MiniFileLoggerTests.swift
+//  MiniFileLogger
+//
+//  Created by Joel Fischer on 11/30/24.
+//
+
 import Testing
 @testable import MiniFileLogger
 
