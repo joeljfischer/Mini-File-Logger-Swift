@@ -30,6 +30,28 @@ import Testing
         try checkDirectory(for: fileLogger, expectedNumLogFiles: 1)
     }
 
+    @Test func testWriteFiveLog() async throws {
+        for _ in 0..<5 {
+            fileLogger.writeLog("Test log", level: .debug, subsystem: "Test", category: "Test")
+        }
+        try checkDirectory(for: fileLogger, expectedNumLogFiles: 1)
+
+        // TODO: Check file for correct number of lines and format of data
+    }
+
+    @Test func testWrite5000Log() async throws {
+        for _ in 0..<5000 {
+            fileLogger.writeLog("Test log", level: .debug, subsystem: "Test", category: "Test")
+        }
+        try checkDirectory(for: fileLogger, expectedNumLogFiles: 1)
+
+        // TODO: Check file for correct number of lines and format of data
+    }
+
+    @Test func testRolloverToNewFile() async throws {
+        
+    }
+
     // MARK: Helpers
     private func checkDirectory(for fileLogger: FileLogger, expectedNumLogFiles: Int) throws {
         let baseDirectoryURL = fileLogger.baseDirectoryURL
