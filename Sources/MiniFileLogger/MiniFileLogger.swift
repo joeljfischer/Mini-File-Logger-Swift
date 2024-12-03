@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 
 open class FileLogger {
     /// Maximum file size of a log in kilobytes
@@ -14,14 +15,11 @@ open class FileLogger {
     /// The directory to store log files within. Defaults to `/Caches/logs/`. If you have a shared container, it is recommended that you use a directory within that. The directory will be created if needed. Any directory you use will be extended with additional folders for each platform, e.g. `{{baseDirectoryURL}}/watchOS/`. See `directory` for more details.
     public let baseDirectoryURL: URL
 
-    /// The date format to use in the log string. Defaults to `.abbreviated`.
-    public let dateFormat: Date.FormatStyle.DateStyle
-
-    /// The time format to use in the log string. Defaults to `.standard`.
-    public let timeFormat: Date.FormatStyle.TimeStyle
-
     /// Whether or not the file logger is disabled (currently only automatically disabled in previews)
     public let isDisabled: Bool
+
+    /// If and how to log to the console. Defaults to `oslog`.
+    public let consoleLogger: ConsoleLogger
 
     /// The directory to store log files within for this platform. Defaults to `{{baseDirectoryURL}}/logs/{{platform}}`. For example, on watchOS, the default log location will be `{{baseDirectoryURL}}/logs/watchOS/log{{n}}.log`.
     public var directory: URL {
@@ -31,32 +29,31 @@ open class FileLogger {
     private var directoryPath: String {
         directory.path(percentEncoded: false)
     }
-    
+
+    private var osLoggers = [String: Logger]()
+
     /// Initialize a file logger with a given configuration
     /// - Parameters:
     ///   - directoryURL: The directory to store log files within. Defaults to `/Caches/logs/`. If you have a shared container, it is recommended that you use a directory within that. The directory will be created if needed. Any directory you use will be extended with additional folders for each platform, e.g. `{{baseDirectoryURL}}/watchOS/`. See `directory` for more details.
     ///   - fileName: The log name to use. Depending on the `maxFileCount`, this could result in numbers being appended to the log name. For example, if `maxFileCount` is `4` and the `fileName` is `log`, you can expect to see `log.log`, `log1.log`, `log2.log`, and `log3.log` in your folder, in decending order of time (`log.log` always being the newest).
     ///   - maxFileCount: The maximum number of files to store on disk before deleting the oldest.
-    ///   - maxFileSize: The maxiumum file size before rolling to a new file.
-    ///   - dateFormat: The date format to use when writing a log to the file. Defaults to `.abbreviated`.
-    ///   - timeFormat: The time format to use when writing a log to the file. Defaults to `.standard`.
+    ///   - maxFileSize: The maxiumum file size before rolling to a new file (in kilobytes).
+    ///   - isDisabled: Whether or not to disable the file logger. By default `true` only in Swift Canvas/Preview environments.
+    ///   - consoleLogger: Whether and how to log to the console. Defaults to `oslog`.
     public init(
         directoryURL: URL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!.appending(component: "logs", directoryHint: .isDirectory),
         fileName: String = "log",
         maxFileCount: Int = 4,
         maxFileSize: UInt64 = 1024 * 5,
-        dateFormat: Date.FormatStyle.DateStyle = .abbreviated,
-        timeFormat: Date.FormatStyle.TimeStyle = .standard,
-        isDisabled: Bool = FileLogger._isPreview
+        isDisabled: Bool = FileLogger._isPreview,
+        consoleLogger: ConsoleLogger = .oslog
     ) {
         self.baseDirectoryURL = directoryURL
         self.baseFileName = fileName
         self.maxFileCount = maxFileCount
         self.maxFileSize = maxFileSize
-        self.dateFormat = dateFormat
-        self.timeFormat = timeFormat
         self.isDisabled = isDisabled
-        // TODO: Add an option to print or log to OSLog automatically
+        self.consoleLogger = consoleLogger
 
         createDirectoryIfNeeded()
     }
@@ -76,6 +73,15 @@ open class FileLogger {
         let logURL = directory.appendingPathComponent("\(baseFileName).log")
         if !FileManager.default.fileExists(atPath: logURL.path(percentEncoded: false)) { setup() }
 
+        let string = "\(level) [\(subsystem)|\(category)] (\(Date.now.ISO8601Format(.iso8601))): \(message)\n"
+        switch consoleLogger {
+        case .none: break
+        case .print: print(string)
+        case .oslog: logToOSLog(message, level: level, subsystem: subsystem, category: category)
+
+        }
+        guard !isDisabled else { return }
+
         let logHandle: FileHandle
         do { logHandle = try FileHandle(forWritingTo: logURL) } catch {
             print("📜❌ FileLogger failed to get a handle for writing to \(logURL) with error: \(error)")
@@ -84,8 +90,6 @@ open class FileLogger {
 
         do {
             try logHandle.seekToEnd()
-            // TODO: Improve date formatting (need millisecond precision, etc.
-            let string = "\(level) [\(subsystem)|\(category)] (\(Date.now.formatted(date: dateFormat, time: timeFormat))): \(message)"
             try logHandle.write(contentsOf: string.data(using: .utf8)!)
             try logHandle.close()
         } catch {
@@ -116,8 +120,12 @@ open class FileLogger {
         #endif
     }
 
+    // MARK: - Private
+    // MARK: Lifecycle
     /// Sets up for a new log file. Renames all existing log files up one number and creates a new empty log file at `baseFileName.log`. Will `cleanup()` when finished.
     private func setup() {
+        guard !isDisabled else { return }
+
         let logURLs: [URL]
         do {
             logURLs = try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil).filter {
@@ -147,6 +155,8 @@ open class FileLogger {
 
     /// Gets all logs in the log directory, deleting anything that isn't a log and all logs that are above the max file count
     private func cleanup() {
+        guard !isDisabled else { return }
+
         let directoryURLs: [URL]
         do { directoryURLs = try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil) } catch {
             print("📜❌ FileLogger failed to get files in directory: \(directory) with error: \(error)")
@@ -173,6 +183,7 @@ open class FileLogger {
         }
     }
 
+    // MARK: Utilities
     private func createDirectoryIfNeeded() {
         guard !FileManager.default.fileExists(atPath: directoryPath) else { return }
 
@@ -187,6 +198,22 @@ open class FileLogger {
     private func numberFromFileURL(_ fileURL: URL) -> Int? {
         guard let fileName = fileURL.lastPathComponent.split(separator: ".").first else { return nil }
         return Int(String(fileName.suffix(1)))
+    }
+
+    private func logToOSLog(_ message: MiniFileLog, level: Level, subsystem: String, category: String) {
+        var logger: Logger
+        if osLoggers["\(subsystem)|\(category)"] == nil {
+            osLoggers["\(subsystem)|\(category)"] = Logger(subsystem: subsystem, category: category)
+        }
+        logger = osLoggers["\(subsystem)|\(category)"]!
+        switch level {
+        case .verbose: logger.trace("\(message.message)")
+        case .debug: logger.debug("\(message.message)")
+        case .info: logger.info("\(message.message)")
+        case .warning: logger.warning("\(message.message)")
+        case .error: logger.error("\(message.message)")
+        case .critical: logger.critical("\(message.message)")
+        }
     }
 
     static let platformName: String = {
@@ -234,5 +261,9 @@ open class FileLogger {
             case .critical: "CRT"
             }
         }
+    }
+
+    public enum ConsoleLogger {
+        case none, print, oslog
     }
 }
