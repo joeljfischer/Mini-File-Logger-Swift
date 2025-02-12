@@ -2,7 +2,7 @@ import Foundation
 import OSLog
 
 open class FileLogger {
-    /// Maximum file size of a log in kilobytes
+    /// Maximum file size of a log in bytes
     public let maxFileSize: UInt64
 
     /// Maximum number of files at rest on disk
@@ -37,14 +37,14 @@ open class FileLogger {
     ///   - directoryURL: The directory to store log files within. Defaults to `/Caches/logs/`. If you have a shared container, it is recommended that you use a directory within that. The directory will be created if needed. Any directory you use will be extended with additional folders for each platform, e.g. `{{baseDirectoryURL}}/watchOS/`. See `directory` for more details.
     ///   - fileName: The log name to use. Depending on the `maxFileCount`, this could result in numbers being appended to the log name. For example, if `maxFileCount` is `4` and the `fileName` is `log`, you can expect to see `log.log`, `log1.log`, `log2.log`, and `log3.log` in your folder, in decending order of time (`log.log` always being the newest).
     ///   - maxFileCount: The maximum number of files to store on disk before deleting the oldest.
-    ///   - maxFileSize: The maxiumum file size before rolling to a new file (in kilobytes).
+    ///   - maxFileSize: The maxiumum file size before rolling to a new file (in bytes).
     ///   - isDisabled: Whether or not to disable the file logger. By default `true` only in Swift Canvas/Preview environments.
     ///   - consoleLogger: Whether and how to log to the console. Defaults to `oslog`.
     public init(
         directoryURL: URL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!.appending(component: "logs", directoryHint: .isDirectory),
         fileName: String = "log",
         maxFileCount: Int = 4,
-        maxFileSize: UInt64 = 1024 * 5,
+        maxFileSize: UInt64 = 5 * 1024 * 1024, // 5 megabytes
         isDisabled: Bool = FileLogger._isPreview,
         consoleLogger: ConsoleLogger = .oslog
     ) {
@@ -98,14 +98,8 @@ open class FileLogger {
         }
 
         do {
-            let attrs = try FileManager.default.attributesOfItem(atPath: logURL.path(percentEncoded: false))
-            guard let fileSizeBytes = attrs[.size] as? UInt64 else {
-                print("📜❌ FileLogger failed to get file size of \(logURL)")
-                return
-            }
-
-            let fileSizeKB = fileSizeBytes / 1024
-            if fileSizeKB > maxFileSize { setup() }
+            let fileSizeBytes = try logURL.resourceValues(forKeys: [.totalFileSizeKey]).totalFileSize ?? 0
+            if fileSizeBytes > maxFileSize { setup() }
         } catch {
             print("📜❌ FileLogger failed to get attributes of item at \(logURL) with error: \(error)")
             return
@@ -137,9 +131,16 @@ open class FileLogger {
         }
 
         for logURL in logURLs {
-            let currentNumber = numberFromFileURL(logURL)
-            let newNumber = (currentNumber != nil) ? (currentNumber! + 1) : 1
-            let newURL = logURL.deletingLastPathComponent().appending(path: "\(baseFileName)\(newNumber).log")
+            let newFileName: String
+            if let currentNumber = numberFromFileURL(logURL) {
+                let newNumber = (currentNumber < maxFileCount) ? (currentNumber + 1) : 1
+                newFileName = "\(baseFileName)\(newNumber).log"
+            } else {
+                newFileName = "\(baseFileName)1.log"
+            }
+
+            // TODO: Delete old file at name if it exists
+            let newURL = directory.appending(path: newFileName)
             do { try FileManager.default.moveItem(at: logURL, to: newURL) } catch {
                 print("📜❌ FileLogger failed to move file at url \(logURL) to \(newURL) with error: \(error)")
             }
@@ -153,7 +154,7 @@ open class FileLogger {
         }
     }
 
-    /// Gets all logs in the log directory, deleting anything that isn't a log and all logs that are above the max file count
+    /// Gets all logs in the log directory, deleting anything that isn't a log and the oldest logs above the max file count
     private func cleanup() {
         guard !isDisabled else { return }
 
@@ -197,7 +198,9 @@ open class FileLogger {
 
     private func numberFromFileURL(_ fileURL: URL) -> Int? {
         guard let fileName = fileURL.lastPathComponent.split(separator: ".").first else { return nil }
-        return Int(String(fileName.suffix(1)))
+        let numberString = String(fileName.dropFirst(3))
+
+        return Int(numberString)
     }
 
     private func logToOSLog(_ message: MiniFileLog, level: Level, subsystem: String, category: String) {

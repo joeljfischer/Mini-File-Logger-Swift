@@ -49,7 +49,7 @@ import Testing
     }
 
     @Test func testWrite1000000Log() async throws {
-        for _ in 0..<5000 {
+        for _ in 0..<1_000_000 {
             fileLogger.writeLog("Test log", level: .debug, subsystem: "Test", category: "Test")
         }
         try checkDirectory(for: fileLogger, expectedNumLogFiles: 1)
@@ -69,11 +69,12 @@ import Testing
         #expect(contents.count == expectedNumLogFiles, "Log count: \(contents.count), expected: \(expectedNumLogFiles). All files in directory: \(contents)")
         print("Logs in folder: \(contents)")
 
-        let fileSize = try! FileManager.default.attributesOfItem(atPath: contents.first!.path())[.size] as! Int64
-        print("File size: \(ByteCountFormatter.string(fromByteCount: fileSize, countStyle: .file))")
+
+        let fileSize = try! contents.first!.resourceValues(forKeys: [.totalFileSizeKey]).totalFileSize ?? 0
+        print("File size: \(ByteCountFormatter.string(fromByteCount: Int64(fileSize), countStyle: .file))")
 
         let firstLog = try? String(contentsOf: contents.first!, encoding: .utf8)
-        print("Log contents: \(firstLog ?? "nil")")
+        print("Log contents:\n\(firstLog ?? "nil")")
     }
     
     private func clearDirectory(for fileLogger: FileLogger) throws {
