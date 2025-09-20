@@ -12,10 +12,10 @@ Mini File Logger has several helpful features:
 This allows you to build a system that logs both to `os_log` (for console output) and to MiniFileLogger.
 
 ### Installation
-Install is accomplished through Swift Package Manager.
+Installing is accomplished through Swift Package Manager.
 
 #### Using Xcode
-Go to your project settings, select the "Package Dependencies" tab and press the "+" button. In the "Search or Enter Package URL" field, paste:
+Go to your project settings, select the "Package Dependencies" tab, and press the "+" button. In the "Search or Enter Package URL" field, paste:
 
 ```
 https://github.com/joeljfischer/Mini-File-Logger-Swift
@@ -54,7 +54,7 @@ static let fileLogger: FileLogger = {
 }()
 ```
 
-There are additional options on initialization if you don't like the defaults.
+There are additional options available for initialization if you prefer not to use the defaults.
 
 #### Writing Logs
 Writing a log is then fairly simple:
@@ -131,3 +131,6 @@ nonisolated enum Log {
     // And so on...
 }
 ```
+
+### In Use
+This repository is in use in production in my app [Rainy Skies](https://apps.apple.com/us/app/rainy-skies/id1637453069)
