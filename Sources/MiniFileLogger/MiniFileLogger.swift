@@ -1,7 +1,8 @@
 import Foundation
 import OSLog
+import Synchronization
 
-open class FileLogger {
+public final class FileLogger: Sendable {
     /// Maximum file size of a log in bytes
     public let maxFileSize: UInt64
 
@@ -30,7 +31,13 @@ open class FileLogger {
         directory.path(percentEncoded: false)
     }
 
-    private var osLoggers = [String: Logger]()
+    private let osLoggerCache = Mutex<[String: Logger]>([:])
+    private var osLoggers: [String: Logger] {
+        osLoggerCache.withLock { $0 }
+    }
+    private func addLogger(key: String, value: Logger) {
+        osLoggerCache.withLock { $0[key] = value }
+    }
 
     /// Initialize a file logger with a given configuration
     /// - Parameters:
@@ -78,7 +85,6 @@ open class FileLogger {
         case .none: break
         case .print: print(string)
         case .oslog: logToOSLog(message, level: level, subsystem: subsystem, category: category)
-
         }
         guard !isDisabled else { return }
 
@@ -204,11 +210,15 @@ open class FileLogger {
     }
 
     private func logToOSLog(_ message: MiniFileLog, level: Level, subsystem: String, category: String) {
-        var logger: Logger
-        if osLoggers["\(subsystem)|\(category)"] == nil {
-            osLoggers["\(subsystem)|\(category)"] = Logger(subsystem: subsystem, category: category)
+        let key = "\(subsystem)|\(category)"
+        let logger = osLoggerCache.withLock {
+            if $0[key] == nil {
+                $0[key] = Logger(subsystem: subsystem, category: category)
+            }
+
+            return $0[key]!
         }
-        logger = osLoggers["\(subsystem)|\(category)"]!
+
         switch level {
         case .verbose: logger.trace("\(message.message)")
         case .debug: logger.debug("\(message.message)")
@@ -266,7 +276,7 @@ open class FileLogger {
         }
     }
 
-    public enum ConsoleLogger {
+    public enum ConsoleLogger: Sendable {
         case none, print, oslog
     }
 }

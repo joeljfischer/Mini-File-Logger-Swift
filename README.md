@@ -35,10 +35,10 @@ dependencies: [
 ### Requirements
 | Platform                                             | Status                   |
 | ---------------------------------------------------- | ------------------------ |
-| iOS 16.0+                                            | Fully Tested             |
-| macOS 13.0+                                          | Partially Tested         |
-| watchOS 9.0+                                         | Partially Tested         |
-| tvOS 16.0+                                           | Untested                 |
+| iOS 18.0+                                            | Partially Tested         |
+| macOS 15.0+                                          | Partially Tested         |
+| watchOS 11.0+                                        | Partially Tested         |
+| tvOS 18.0+                                           | Untested                 |
 | visionOS 1.0+                                        | Untested                 |
 
 ### Usage
