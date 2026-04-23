@@ -14,7 +14,6 @@
 		AA000000000000000000B006 /* LogDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F006 /* LogDocument.swift */; };
 		AA000000000000000000B007 /* FilterState.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F007 /* FilterState.swift */; };
 		AA000000000000000000B008 /* LogParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F008 /* LogParser.swift */; };
-		AA000000000000000000B009 /* FileWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F009 /* FileWatcher.swift */; };
 		AA000000000000000000B010 /* FilterBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F010 /* FilterBar.swift */; };
 		AA000000000000000000B011 /* LogTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F011 /* LogTableView.swift */; };
 		AA000000000000000000B012 /* LogDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F012 /* LogDetailView.swift */; };
@@ -31,7 +30,6 @@
 		AA000000000000000000F006 /* LogDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogDocument.swift; sourceTree = "<group>"; };
 		AA000000000000000000F007 /* FilterState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterState.swift; sourceTree = "<group>"; };
 		AA000000000000000000F008 /* LogParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogParser.swift; sourceTree = "<group>"; };
-		AA000000000000000000F009 /* FileWatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileWatcher.swift; sourceTree = "<group>"; };
 		AA000000000000000000F010 /* FilterBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterBar.swift; sourceTree = "<group>"; };
 		AA000000000000000000F011 /* LogTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogTableView.swift; sourceTree = "<group>"; };
 		AA000000000000000000F012 /* LogDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogDetailView.swift; sourceTree = "<group>"; };
@@ -74,7 +72,6 @@
 				AA000000000000000000F013 /* Assets.xcassets */,
 				AA000000000000000000C003 /* Models */,
 				AA000000000000000000C004 /* Parsing */,
-				AA000000000000000000C005 /* Watching */,
 				AA000000000000000000C006 /* Views */,
 			);
 			path = LogViewer;
@@ -97,14 +94,6 @@
 				AA000000000000000000F008 /* LogParser.swift */,
 			);
 			path = Parsing;
-			sourceTree = "<group>";
-		};
-		AA000000000000000000C005 /* Watching */ = {
-			isa = PBXGroup;
-			children = (
-				AA000000000000000000F009 /* FileWatcher.swift */,
-			);
-			path = Watching;
 			sourceTree = "<group>";
 		};
 		AA000000000000000000C006 /* Views */ = {
@@ -199,7 +188,6 @@
 				AA000000000000000000B006 /* LogDocument.swift in Sources */,
 				AA000000000000000000B007 /* FilterState.swift in Sources */,
 				AA000000000000000000B008 /* LogParser.swift in Sources */,
-				AA000000000000000000B009 /* FileWatcher.swift in Sources */,
 				AA000000000000000000B010 /* FilterBar.swift in Sources */,
 				AA000000000000000000B011 /* LogTableView.swift in Sources */,
 				AA000000000000000000B012 /* LogDetailView.swift in Sources */,

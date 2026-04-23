@@ -20,10 +20,6 @@ struct FilterBar: View {
 
             Divider().frame(height: 20)
 
-            TextField("Subsystem", text: $filterState.subsystemFilter)
-                .textFieldStyle(.roundedBorder)
-                .frame(width: 120)
-
             TextField("Category", text: $filterState.categoryFilter)
                 .textFieldStyle(.roundedBorder)
                 .frame(width: 100)

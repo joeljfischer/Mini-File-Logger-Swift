@@ -6,77 +6,53 @@ extension UTType {
 }
 
 struct ContentView: View {
-    @State private var documents: [LogDocument] = []
-    @State private var selectedDocumentID: LogDocument.ID?
+    @State private var document: LogDocument?
     @State private var selectedEntryID: LogEntry.ID?
     @State private var filterState = FilterState()
     @State private var isFileImporterPresented = false
-
-    private var selectedDocument: LogDocument? {
-        documents.first { $0.id == selectedDocumentID }
-    }
+    @State private var isDropTargeted = false
 
     private var filteredEntries: [LogEntry] {
-        selectedDocument?.entries.filter { filterState.matches($0) } ?? []
+        document?.entries.filter { filterState.matches($0) } ?? []
     }
 
     var body: some View {
-        NavigationSplitView {
-            sidebar
-                .navigationSplitViewColumnWidth(min: 180, ideal: 220)
-        } detail: {
-            detail
+        Group {
+            if document != nil {
+                loaded
+            } else {
+                empty
+            }
         }
         .fileImporter(
             isPresented: $isFileImporterPresented,
             allowedContentTypes: [.logFile, .plainText],
-            allowsMultipleSelection: true
+            allowsMultipleSelection: false
         ) { result in
-            guard case .success(let urls) = result else { return }
-            for url in urls {
-                _ = url.startAccessingSecurityScopedResource()
-                let doc = LogDocument(url: url)
-                documents.append(doc)
-                selectedDocumentID = doc.id
-                selectedEntryID = nil
-            }
+            guard case .success(let urls) = result, let url = urls.first else { return }
+            open(url: url)
+        }
+        .onDrop(of: [.fileURL], isTargeted: $isDropTargeted) { providers in
+            handleDrop(providers: providers)
         }
     }
 
-    // MARK: Sidebar
-
-    private var sidebar: some View {
-        List(documents, selection: $selectedDocumentID) { doc in
-            Label {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(doc.fileName).font(.body)
-                    Text("\(doc.entries.count) entries")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            } icon: {
-                Image(systemName: doc.isWatching
-                      ? "antenna.radiowaves.left.and.right"
-                      : "doc.text")
-                .foregroundStyle(doc.isWatching ? .green : .secondary)
-            }
-            .tag(doc.id)
+    private var empty: some View {
+        ContentUnavailableView {
+            Label("No Log File Open", systemImage: "doc.text.magnifyingglass")
+        } description: {
+            Text("Drop a MiniFileLogger .log file here, or click below to open one.")
+        } actions: {
+            Button("Open Log File") { isFileImporterPresented = true }
+                .buttonStyle(.borderedProminent)
         }
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button { isFileImporterPresented = true } label: {
-                    Label("Open Log File", systemImage: "plus")
-                }
-            }
-        }
-        .onChange(of: selectedDocumentID) { selectedEntryID = nil }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(isDropTargeted ? Color.accentColor.opacity(0.1) : .clear)
     }
-
-    // MARK: Detail
 
     @ViewBuilder
-    private var detail: some View {
-        if let doc = selectedDocument {
+    private var loaded: some View {
+        if let doc = document {
             VSplitView {
                 VStack(spacing: 0) {
                     FilterBar(filterState: filterState)
@@ -86,28 +62,24 @@ struct ContentView: View {
                 .frame(minHeight: 200)
 
                 Group {
-                    if let entry = selectedDocument?.entries.first(where: { $0.id == selectedEntryID }) {
+                    if let entry = doc.entries.first(where: { $0.id == selectedEntryID }) {
                         LogDetailView(entry: entry)
                     } else {
-                        ContentUnavailableView(
-                            "Select a Log Entry",
-                            systemImage: "text.alignleft",
-                            description: Text("Select an entry above to see its details.")
-                        )
+                        Color.clear
                     }
                 }
                 .frame(minHeight: 140, idealHeight: 240)
+                .onChange(of: filteredEntries.map(\.id), initial: true) { _, ids in
+                    if selectedEntryID == nil || !ids.contains(where: { $0 == selectedEntryID }) {
+                        selectedEntryID = ids.first
+                    }
+                }
             }
+            .navigationTitle(doc.fileName)
             .toolbar {
                 ToolbarItem {
-                    Button(doc.isWatching ? "Stop Watching" : "Watch File") {
-                        if doc.isWatching { doc.stopWatching() } else { doc.startWatching() }
-                    }
-                    .help(doc.isWatching ? "Stop watching for new log entries" : "Watch file for new log entries")
-                }
-                ToolbarItem {
                     Button("Reload", systemImage: "arrow.clockwise") { doc.load() }
-                    .help("Reload log file from disk")
+                        .help("Reload log file from disk")
                 }
                 ToolbarItem {
                     TextField("Search", text: $filterState.searchText)
@@ -115,12 +87,21 @@ struct ContentView: View {
                         .frame(width: 200)
                 }
             }
-        } else {
-            ContentUnavailableView(
-                "No Log File Open",
-                systemImage: "doc.text.magnifyingglass",
-                description: Text("Click + to open a MiniFileLogger .log file.")
-            )
         }
+    }
+
+    private func open(url: URL) {
+        _ = url.startAccessingSecurityScopedResource()
+        document = LogDocument(url: url)
+        selectedEntryID = nil
+    }
+
+    private func handleDrop(providers: [NSItemProvider]) -> Bool {
+        guard let provider = providers.first else { return false }
+        _ = provider.loadObject(ofClass: URL.self) { url, _ in
+            guard let url else { return }
+            Task { @MainActor in open(url: url) }
+        }
+        return true
     }
 }

@@ -1,6 +1,6 @@
 import Foundation
 
-struct LogEntry: Identifiable, Sendable {
+struct LogEntry: Identifiable, Equatable, Sendable {
     let id: UUID
     let lineNumber: Int
     let level: LogLevel?
