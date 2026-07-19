@@ -605,9 +605,9 @@ git commit -m "feat: add LogViewer import commands"
 - Consumes: controller, state, commands, session and entry managed objects, filtered fetch request.
 - Produces: all requested user entry paths and toolbar filters in running app.
 
-- [ ] **Step 1: Write compile-facing UI contract checks**
+- [ ] **Step 1: Establish UI verification gates**
 
-Add source assertions to `LogViewerStateTests` or a small project-structure test that checks app resources include strings `Open Log File`, `Minimum Log Level`, and `Search Logs`, and verify the target compiles after each UI slice. Keep behavior verification manual because these are macOS menu/open-panel/drop interactions.
+Use existing focused state and persistence tests for nonvisual behavior. Verify each UI slice by compiling the app, then verify menu, open-panel, toolbar, and drop interactions manually in Task 7; do not add tests that inspect source strings.
 
 - [ ] **Step 2: Inject dependencies at app root**
 
