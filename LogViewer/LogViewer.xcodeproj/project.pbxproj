@@ -11,10 +11,7 @@
 		AA000000000000000000B003 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F003 /* ContentView.swift */; };
 		AA000000000000000000B004 /* LogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F004 /* LogEntry.swift */; };
 		AA000000000000000000B005 /* LogLevel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F005 /* LogLevel.swift */; };
-		AA000000000000000000B006 /* LogDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F006 /* LogDocument.swift */; };
-		AA000000000000000000B007 /* FilterState.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F007 /* FilterState.swift */; };
 		AA000000000000000000B008 /* LogParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F008 /* LogParser.swift */; };
-		AA000000000000000000B010 /* FilterBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F010 /* FilterBar.swift */; };
 		AA000000000000000000B011 /* LogTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F011 /* LogTableView.swift */; };
 		AA000000000000000000B012 /* LogDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F012 /* LogDetailView.swift */; };
 		AA000000000000000000B013 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F013 /* Assets.xcassets */; };
@@ -41,10 +38,7 @@
 		AA000000000000000000F003 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		AA000000000000000000F004 /* LogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntry.swift; sourceTree = "<group>"; };
 		AA000000000000000000F005 /* LogLevel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogLevel.swift; sourceTree = "<group>"; };
-		AA000000000000000000F006 /* LogDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogDocument.swift; sourceTree = "<group>"; };
-		AA000000000000000000F007 /* FilterState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterState.swift; sourceTree = "<group>"; };
 		AA000000000000000000F008 /* LogParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogParser.swift; sourceTree = "<group>"; };
-		AA000000000000000000F010 /* FilterBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterBar.swift; sourceTree = "<group>"; };
 		AA000000000000000000F011 /* LogTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogTableView.swift; sourceTree = "<group>"; };
 		AA000000000000000000F012 /* LogDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogDetailView.swift; sourceTree = "<group>"; };
 		AA000000000000000000F013 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -138,8 +132,6 @@
 				AA000000000000000000F004 /* LogEntry.swift */,
 				AA000000000000000000F005 /* LogLevel.swift */,
 				AA000000000000000000F022 /* MinimumLogLevel.swift */,
-				AA000000000000000000F006 /* LogDocument.swift */,
-				AA000000000000000000F007 /* FilterState.swift */,
 				AA000000000000000000F021 /* LogViewerError.swift */,
 			);
 			path = Models;
@@ -190,7 +182,6 @@
 		AA000000000000000000C006 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				AA000000000000000000F010 /* FilterBar.swift */,
 				AA000000000000000000F011 /* LogTableView.swift */,
 				AA000000000000000000F012 /* LogDetailView.swift */,
 			);
@@ -327,10 +318,7 @@
 				AA000000000000000000B003 /* ContentView.swift in Sources */,
 				AA000000000000000000B004 /* LogEntry.swift in Sources */,
 				AA000000000000000000B005 /* LogLevel.swift in Sources */,
-				AA000000000000000000B006 /* LogDocument.swift in Sources */,
-				AA000000000000000000B007 /* FilterState.swift in Sources */,
 				AA000000000000000000B008 /* LogParser.swift in Sources */,
-				AA000000000000000000B010 /* FilterBar.swift in Sources */,
 				AA000000000000000000B011 /* LogTableView.swift in Sources */,
 				AA000000000000000000B012 /* LogDetailView.swift in Sources */,
 				AA000000000000000000B017 /* PersistenceController.swift in Sources */,

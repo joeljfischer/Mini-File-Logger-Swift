@@ -1,3 +1,4 @@
+import CoreData
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -6,102 +7,128 @@ extension UTType {
 }
 
 struct ContentView: View {
-    @State private var document: LogDocument?
-    @State private var selectedEntryID: LogEntry.ID?
-    @State private var filterState = FilterState()
-    @State private var isFileImporterPresented = false
+    @Bindable var state: LogViewerState
+
+    let commandCoordinator: LogViewerCommandCoordinator
+
+    @FetchRequest private var sessions: FetchedResults<LogSession>
+    @State private var selectedEntryID: NSManagedObjectID?
     @State private var isDropTargeted = false
 
-    private var filteredEntries: [LogEntry] {
-        document?.entries.filter { filterState.matches($0) } ?? []
+    init(
+        state: LogViewerState,
+        commandCoordinator: LogViewerCommandCoordinator
+    ) {
+        self.state = state
+        self.commandCoordinator = commandCoordinator
+
+        let request = LogSession.fetchRequest()
+        request.sortDescriptors = [
+            NSSortDescriptor(key: "importedAt", ascending: false)
+        ]
+        request.fetchLimit = 1
+        _sessions = FetchRequest(fetchRequest: request, animation: .default)
+    }
+
+    private var currentSession: LogSession? {
+        sessions.first
     }
 
     var body: some View {
         Group {
-            if document != nil {
-                loaded
+            if let session = currentSession {
+                LogTableView(
+                    session: session,
+                    searchText: state.searchText,
+                    minimumLevel: state.minimumLevel,
+                    selectedEntryID: $selectedEntryID
+                )
             } else {
-                empty
+                noFileView
             }
         }
+        .background(isDropTargeted ? Color.accentColor.opacity(0.08) : .clear)
+        .navigationTitle(currentSession?.fileName ?? "LogViewer")
+        .focusedSceneValue(\.logViewerCommandCoordinator, commandCoordinator)
         .fileImporter(
-            isPresented: $isFileImporterPresented,
+            isPresented: $state.isImporterPresented,
             allowedContentTypes: [.logFile, .plainText],
             allowsMultipleSelection: false
         ) { result in
-            guard case .success(let urls) = result, let url = urls.first else { return }
-            open(url: url)
+            switch result {
+            case .success(let urls):
+                guard let url = urls.first else { return }
+                Task { await state.importFile(at: url) }
+            case .failure(let error):
+                guard (error as? CocoaError)?.code != .userCancelled else { return }
+                state.presentedError = LogViewerError(error)
+            }
         }
-        .onDrop(of: [.fileURL], isTargeted: $isDropTargeted) { providers in
-            handleDrop(providers: providers)
+        .dropDestination(for: URL.self) { urls, _ in
+            guard let url = urls.first else { return false }
+            Task { await state.importFile(at: url) }
+            return true
+        } isTargeted: { isTargeted in
+            isDropTargeted = isTargeted
         }
+        .alert("Could Not Open Log File", isPresented: isErrorPresented) {
+            Button("OK") {
+                state.presentedError = nil
+            }
+        } message: {
+            Text(state.presentedError?.localizedDescription ?? "An unknown error occurred.")
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigation) {
+                if state.isImporting {
+                    ProgressView()
+                        .accessibilityLabel("Importing Log File")
+                } else {
+                    Button("Open Log File", systemImage: "folder") {
+                        state.presentImporter()
+                    }
+                }
+            }
+
+            ToolbarItem {
+                Picker("Minimum Log Level", selection: $state.minimumLevel) {
+                    ForEach(MinimumLogLevel.allCases) { level in
+                        Text(level.displayName).tag(level)
+                    }
+                }
+                .pickerStyle(.menu)
+            }
+        }
+        .searchable(
+            text: $state.searchText,
+            isPresented: $state.isSearchPresented,
+            placement: .toolbar,
+            prompt: "Search Logs"
+        )
     }
 
-    private var empty: some View {
+    private var noFileView: some View {
         ContentUnavailableView {
             Label("No Log File Open", systemImage: "doc.text.magnifyingglass")
         } description: {
-            Text("Drop a MiniFileLogger .log file here, or click below to open one.")
+            Text("Drop a MiniFileLogger .log file here, or open one from the toolbar.")
         } actions: {
-            Button("Open Log File") { isFileImporterPresented = true }
-                .buttonStyle(.borderedProminent)
+            Button("Open Log File") {
+                state.presentImporter()
+            }
+            .buttonStyle(.borderedProminent)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(isDropTargeted ? Color.accentColor.opacity(0.1) : .clear)
     }
 
-    @ViewBuilder
-    private var loaded: some View {
-        if let doc = document {
-            VSplitView {
-                VStack(spacing: 0) {
-                    FilterBar(filterState: filterState)
-                    Divider()
-                    LogTableView(entries: filteredEntries, selectedEntryID: $selectedEntryID)
-                }
-                .frame(minHeight: 200)
-
-                Group {
-                    if let entry = doc.entries.first(where: { $0.id == selectedEntryID }) {
-                        LogDetailView(entry: entry)
-                    } else {
-                        Color.clear
-                    }
-                }
-                .frame(minHeight: 140, idealHeight: 240)
-                .onChange(of: filteredEntries.map(\.id), initial: true) { _, ids in
-                    if selectedEntryID == nil || !ids.contains(where: { $0 == selectedEntryID }) {
-                        selectedEntryID = ids.first
-                    }
+    private var isErrorPresented: Binding<Bool> {
+        Binding(
+            get: { state.presentedError != nil },
+            set: { isPresented in
+                if !isPresented {
+                    state.presentedError = nil
                 }
             }
-            .navigationTitle(doc.fileName)
-            .toolbar {
-                ToolbarItem {
-                    Button("Reload", systemImage: "arrow.clockwise") { doc.load() }
-                        .help("Reload log file from disk")
-                }
-                ToolbarItem {
-                    TextField("Search", text: $filterState.searchText)
-                        .textFieldStyle(.roundedBorder)
-                        .frame(width: 200)
-                }
-            }
-        }
-    }
-
-    private func open(url: URL) {
-        _ = url.startAccessingSecurityScopedResource()
-        document = LogDocument(url: url)
-        selectedEntryID = nil
-    }
-
-    private func handleDrop(providers: [NSItemProvider]) -> Bool {
-        guard let provider = providers.first else { return false }
-        _ = provider.loadObject(ofClass: URL.self) { url, _ in
-            guard let url else { return }
-            Task { @MainActor in open(url: url) }
-        }
-        return true
+        )
     }
 }

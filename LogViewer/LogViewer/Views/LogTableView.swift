@@ -1,119 +1,141 @@
+import CoreData
 import SwiftUI
 
 struct LogTableView: View {
-    let entries: [LogEntry]
-    @Binding var selectedEntryID: LogEntry.ID?
+    @Environment(\.managedObjectContext) private var viewContext
+    @FetchRequest private var entries: FetchedResults<StoredLogEntry>
+    @ObservedObject private var session: LogSession
 
-    private let timestampWidth: CGFloat = 90
-    private let categoryWidth: CGFloat = 80
-    private let levelWidth: CGFloat = 38
+    @Binding var selectedEntryID: NSManagedObjectID?
+
+    init(
+        session: LogSession,
+        searchText: String,
+        minimumLevel: MinimumLogLevel,
+        selectedEntryID: Binding<NSManagedObjectID?>
+    ) {
+        _session = ObservedObject(wrappedValue: session)
+        _selectedEntryID = selectedEntryID
+
+        let request = StoredLogEntry.filteredFetchRequest(
+            searchText: searchText,
+            minimumLevel: minimumLevel
+        )
+        let sessionPredicate = NSPredicate(format: "session == %@", session)
+        if let filterPredicate = request.predicate {
+            request.predicate = NSCompoundPredicate(
+                andPredicateWithSubpredicates: [sessionPredicate, filterPredicate]
+            )
+        } else {
+            request.predicate = sessionPredicate
+        }
+        _entries = FetchRequest(fetchRequest: request, animation: .default)
+    }
 
     var body: some View {
-        VStack(spacing: 0) {
-            header
-            Divider()
-            ScrollViewReader { proxy in
-                ScrollView {
-                    LazyVStack(spacing: 0) {
-                        ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
-                            LogRow(
-                                entry: entry,
-                                isSelected: entry.id == selectedEntryID,
-                                isAlternate: index.isMultiple(of: 2),
-                                timestampWidth: timestampWidth,
-                                categoryWidth: categoryWidth,
-                                levelWidth: levelWidth
-                            )
-                            .contentShape(Rectangle())
-                            .onTapGesture { selectedEntryID = entry.id }
-                            .id(entry.id)
-                        }
+        if entries.isEmpty {
+            emptyView
+        } else {
+            VSplitView {
+                Table(tableRows, selection: $selectedEntryID) {
+                    TableColumn("Level") { row in
+                        Text(levelText(for: row.entry))
+                    }
+                    .width(min: 70, ideal: 90, max: 120)
+
+                    TableColumn("Timestamp") { row in
+                        Text(timestampText(for: row.entry))
+                            .font(.body.monospacedDigit())
+                    }
+                    .width(min: 140, ideal: 175, max: 210)
+
+                    TableColumn("Category") { row in
+                        Text(row.entry.category.isEmpty ? "—" : row.entry.category)
+                            .lineLimit(1)
+                    }
+                    .width(min: 100, ideal: 150)
+
+                    TableColumn("Message") { row in
+                        Text(row.entry.message)
+                            .lineLimit(1)
                     }
                 }
-                .onChange(of: selectedEntryID) { _, id in
-                    guard let id else { return }
-                    proxy.scrollTo(id, anchor: .center)
+                .frame(minHeight: 220)
+
+                Group {
+                    if let selectedEntry {
+                        LogDetailView(entry: selectedEntry)
+                    } else {
+                        Color.clear
+                    }
                 }
+                .frame(minHeight: 140, idealHeight: 240)
+            }
+            .onChange(of: fetchedObjectIDs, initial: true) { _, objectIDs in
+                if let selectedEntryID, objectIDs.contains(selectedEntryID) {
+                    return
+                }
+                selectedEntryID = objectIDs.first
             }
         }
     }
 
-    private var header: some View {
-        HStack(spacing: 8) {
-            Color.clear.frame(width: levelWidth)
-            Text("Timestamp")
-                .frame(width: timestampWidth, alignment: .leading)
-            Text("Category")
-                .frame(width: categoryWidth, alignment: .leading)
-            Text("Message")
-                .frame(maxWidth: .infinity, alignment: .leading)
+    private var fetchedObjectIDs: [NSManagedObjectID] {
+        entries.map(\.objectID)
+    }
+
+    private var tableRows: [LogTableRow] {
+        entries.map(LogTableRow.init)
+    }
+
+    private var selectedEntry: StoredLogEntry? {
+        guard let selectedEntryID,
+              fetchedObjectIDs.contains(selectedEntryID),
+              let object = try? viewContext.existingObject(with: selectedEntryID)
+        else {
+            return nil
         }
-        .font(.caption.weight(.semibold))
-        .foregroundStyle(.secondary)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
+        return object as? StoredLogEntry
+    }
+
+    private var emptyView: some View {
+        ContentUnavailableView {
+            Label(
+                session.entries.isEmpty ? "No Log Entries" : "No Matching Entries",
+                systemImage: session.entries.isEmpty
+                    ? "doc.text"
+                    : "line.3.horizontal.decrease.circle"
+            )
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onAppear {
+            selectedEntryID = nil
+        }
+    }
+
+    private func levelText(for entry: StoredLogEntry) -> String {
+        guard let code = entry.levelCode else { return "Unknown" }
+        return LogLevel(rawValue: code)?.displayName ?? code
+    }
+
+    private func timestampText(for entry: StoredLogEntry) -> String {
+        entry.timestamp?.formatted(
+            .dateTime
+                .year()
+                .month(.twoDigits)
+                .day(.twoDigits)
+                .hour()
+                .minute()
+                .second()
+                .secondFraction(.fractional(3))
+        ) ?? "—"
     }
 }
 
-private struct LogRow: View {
-    let entry: LogEntry
-    let isSelected: Bool
-    let isAlternate: Bool
-    let timestampWidth: CGFloat
-    let categoryWidth: CGFloat
-    let levelWidth: CGFloat
+private struct LogTableRow: Identifiable {
+    let entry: StoredLogEntry
 
-    var body: some View {
-        HStack(alignment: .top, spacing: 8) {
-            LevelBadge(level: entry.level)
-                .frame(width: levelWidth, alignment: .leading)
-
-            Text(entry.timestamp?.formatted(.dateTime.hour().minute().second().secondFraction(.fractional(3))) ?? "")
-                .font(.caption.monospaced())
-                .foregroundStyle(.secondary)
-                .frame(width: timestampWidth, alignment: .leading)
-
-            Text(entry.category)
-                .font(.caption.monospaced())
-                .lineLimit(1)
-                .truncationMode(.tail)
-                .frame(width: categoryWidth, alignment: .leading)
-
-            Text(entry.message)
-                .font(.caption.monospaced())
-                .foregroundStyle(entry.level?.color ?? .primary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .textSelection(.enabled)
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 4)
-        .background(rowBackground)
-    }
-
-    @ViewBuilder
-    private var rowBackground: some View {
-        if isSelected {
-            Color.accentColor.opacity(0.25)
-        } else if isAlternate {
-            Color.secondary.opacity(0.05)
-        } else {
-            Color.clear
-        }
-    }
-}
-
-private struct LevelBadge: View {
-    let level: LogLevel?
-
-    var body: some View {
-        if let level {
-            Text(level.rawValue)
-                .font(.system(size: 9, weight: .bold, design: .monospaced))
-                .padding(.horizontal, 4)
-                .padding(.vertical, 2)
-                .background(level.color.opacity(0.15))
-                .foregroundStyle(level.color)
-                .clipShape(RoundedRectangle(cornerRadius: 3))
-        }
+    var id: NSManagedObjectID {
+        entry.objectID
     }
 }
