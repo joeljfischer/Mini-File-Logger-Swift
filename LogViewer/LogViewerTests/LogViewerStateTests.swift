@@ -96,6 +96,16 @@ struct LogViewerStateTests {
         #expect(!coordinator.isImporting)
     }
 
+    @Test func openFailurePreservesUnderlyingDescription() {
+        let underlying = CocoaError(.fileReadNoPermission)
+        let error = LogViewerError.openFailed(underlying.localizedDescription)
+
+        #expect(
+            error.errorDescription
+                == "Could not open log file: \(underlying.localizedDescription)"
+        )
+    }
+
     private func makeDefaults() -> UserDefaults {
         let suiteName = "LogViewerStateTests-\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!

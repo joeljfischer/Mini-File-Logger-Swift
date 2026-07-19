@@ -61,7 +61,7 @@ struct ContentView: View {
                 Task { await state.importFile(at: url) }
             case .failure(let error):
                 guard (error as? CocoaError)?.code != .userCancelled else { return }
-                state.presentedError = LogViewerError(error)
+                state.presentedError = .openFailed(error.localizedDescription)
             }
         }
         .dropDestination(for: URL.self) { urls, _ in

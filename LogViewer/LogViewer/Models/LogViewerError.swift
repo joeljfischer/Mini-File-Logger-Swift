@@ -2,6 +2,7 @@ import Foundation
 
 enum LogViewerError: LocalizedError, Identifiable, Equatable {
     case storeLoadFailed(String)
+    case openFailed(String)
     case readFailed(String)
     case invalidUTF8
     case storeSaveFailed(String)
@@ -16,6 +17,8 @@ enum LogViewerError: LocalizedError, Identifiable, Equatable {
         switch self {
         case .storeLoadFailed(let detail):
             "Could not load log database: \(detail)"
+        case .openFailed(let detail):
+            "Could not open log file: \(detail)"
         case .readFailed(let detail):
             "Could not read log file: \(detail)"
         case .invalidUTF8:
