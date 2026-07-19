@@ -33,6 +33,7 @@ struct StoredLogEntryFilterTests {
         )
 
         #expect(results.map(\.rawLine).contains("DISK full"))
+        #expect(results.map(\.rawLine).contains("Dísk cache ready"))
     }
 
     @Test func searchAndMinimumLevelApplyTogether() async throws {
@@ -76,7 +77,7 @@ struct StoredLogEntryFilterTests {
             lineNumber: 2,
             levelCode: "INF",
             levelRank: 2,
-            rawLine: "Disk cache ready"
+            rawLine: "Dísk cache ready"
         )
         insertEntry(
             in: controller.viewContext,
