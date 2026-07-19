@@ -19,6 +19,12 @@
 		AA000000000000000000B012 /* LogDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F012 /* LogDetailView.swift */; };
 		AA000000000000000000B013 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F013 /* Assets.xcassets */; };
 		AA000000000000000000B014 /* LogParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F014 /* LogParserTests.swift */; };
+		AA000000000000000000B015 /* PersistenceControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F016 /* PersistenceControllerTests.swift */; };
+		AA000000000000000000B016 /* LogViewer.xcdatamodeld in Resources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F017 /* LogViewer.xcdatamodeld */; };
+		AA000000000000000000B017 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F018 /* PersistenceController.swift */; };
+		AA000000000000000000B018 /* LogSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F019 /* LogSession.swift */; };
+		AA000000000000000000B019 /* StoredLogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F020 /* StoredLogEntry.swift */; };
+		AA000000000000000000B020 /* LogViewerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F021 /* LogViewerError.swift */; };
 		AA000000000000000000B0FF /* MiniFileLogger in Frameworks */ = {isa = PBXBuildFile; productRef = AA000000000000000000E00D /* MiniFileLogger */; };
 /* End PBXBuildFile section */
 
@@ -37,6 +43,12 @@
 		AA000000000000000000F013 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AA000000000000000000F014 /* LogParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogParserTests.swift; sourceTree = "<group>"; };
 		AA000000000000000000F015 /* LogViewerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LogViewerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA000000000000000000F016 /* PersistenceControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceControllerTests.swift; sourceTree = "<group>"; };
+		AA000000000000000000F017 /* LogViewer.xcdatamodeld */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LogViewer.xcdatamodeld; sourceTree = "<group>"; };
+		AA000000000000000000F018 /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
+		AA000000000000000000F019 /* LogSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogSession.swift; sourceTree = "<group>"; };
+		AA000000000000000000F020 /* StoredLogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoredLogEntry.swift; sourceTree = "<group>"; };
+		AA000000000000000000F021 /* LogViewerError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewerError.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +92,7 @@
 			isa = PBXGroup;
 			children = (
 				AA000000000000000000F014 /* LogParserTests.swift */,
+				AA000000000000000000F016 /* PersistenceControllerTests.swift */,
 			);
 			path = LogViewerTests;
 			sourceTree = "<group>";
@@ -90,8 +103,10 @@
 				AA000000000000000000F002 /* LogViewerApp.swift */,
 				AA000000000000000000F003 /* ContentView.swift */,
 				AA000000000000000000F013 /* Assets.xcassets */,
+				AA000000000000000000F017 /* LogViewer.xcdatamodeld */,
 				AA000000000000000000C003 /* Models */,
 				AA000000000000000000C004 /* Parsing */,
+				AA000000000000000000C007 /* Persistence */,
 				AA000000000000000000C006 /* Views */,
 			);
 			path = LogViewer;
@@ -104,6 +119,7 @@
 				AA000000000000000000F005 /* LogLevel.swift */,
 				AA000000000000000000F006 /* LogDocument.swift */,
 				AA000000000000000000F007 /* FilterState.swift */,
+				AA000000000000000000F021 /* LogViewerError.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -114,6 +130,16 @@
 				AA000000000000000000F008 /* LogParser.swift */,
 			);
 			path = Parsing;
+			sourceTree = "<group>";
+		};
+		AA000000000000000000C007 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				AA000000000000000000F018 /* PersistenceController.swift */,
+				AA000000000000000000F019 /* LogSession.swift */,
+				AA000000000000000000F020 /* StoredLogEntry.swift */,
+			);
+			path = Persistence;
 			sourceTree = "<group>";
 		};
 		AA000000000000000000C006 /* Views */ = {
@@ -234,6 +260,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA000000000000000000B013 /* Assets.xcassets in Resources */,
+				AA000000000000000000B016 /* LogViewer.xcdatamodeld in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -261,6 +288,10 @@
 				AA000000000000000000B010 /* FilterBar.swift in Sources */,
 				AA000000000000000000B011 /* LogTableView.swift in Sources */,
 				AA000000000000000000B012 /* LogDetailView.swift in Sources */,
+				AA000000000000000000B017 /* PersistenceController.swift in Sources */,
+				AA000000000000000000B018 /* LogSession.swift in Sources */,
+				AA000000000000000000B019 /* StoredLogEntry.swift in Sources */,
+				AA000000000000000000B020 /* LogViewerError.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -269,6 +300,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA000000000000000000B014 /* LogParserTests.swift in Sources */,
+				AA000000000000000000B015 /* PersistenceControllerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
