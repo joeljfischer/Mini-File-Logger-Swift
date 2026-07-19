@@ -25,6 +25,8 @@
 		AA000000000000000000B018 /* LogSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F019 /* LogSession.swift */; };
 		AA000000000000000000B019 /* StoredLogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F020 /* StoredLogEntry.swift */; };
 		AA000000000000000000B020 /* LogViewerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F021 /* LogViewerError.swift */; };
+		AA000000000000000000B021 /* MinimumLogLevel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F022 /* MinimumLogLevel.swift */; };
+		AA000000000000000000B022 /* StoredLogEntryFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F023 /* StoredLogEntryFilterTests.swift */; };
 		AA000000000000000000B0FF /* MiniFileLogger in Frameworks */ = {isa = PBXBuildFile; productRef = AA000000000000000000E00D /* MiniFileLogger */; };
 /* End PBXBuildFile section */
 
@@ -49,6 +51,8 @@
 		AA000000000000000000F019 /* LogSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogSession.swift; sourceTree = "<group>"; };
 		AA000000000000000000F020 /* StoredLogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoredLogEntry.swift; sourceTree = "<group>"; };
 		AA000000000000000000F021 /* LogViewerError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewerError.swift; sourceTree = "<group>"; };
+		AA000000000000000000F022 /* MinimumLogLevel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinimumLogLevel.swift; sourceTree = "<group>"; };
+		AA000000000000000000F023 /* StoredLogEntryFilterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoredLogEntryFilterTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,6 +97,7 @@
 			children = (
 				AA000000000000000000F014 /* LogParserTests.swift */,
 				AA000000000000000000F016 /* PersistenceControllerTests.swift */,
+				AA000000000000000000F023 /* StoredLogEntryFilterTests.swift */,
 			);
 			path = LogViewerTests;
 			sourceTree = "<group>";
@@ -117,6 +122,7 @@
 			children = (
 				AA000000000000000000F004 /* LogEntry.swift */,
 				AA000000000000000000F005 /* LogLevel.swift */,
+				AA000000000000000000F022 /* MinimumLogLevel.swift */,
 				AA000000000000000000F006 /* LogDocument.swift */,
 				AA000000000000000000F007 /* FilterState.swift */,
 				AA000000000000000000F021 /* LogViewerError.swift */,
@@ -292,6 +298,7 @@
 				AA000000000000000000B018 /* LogSession.swift in Sources */,
 				AA000000000000000000B019 /* StoredLogEntry.swift in Sources */,
 				AA000000000000000000B020 /* LogViewerError.swift in Sources */,
+				AA000000000000000000B021 /* MinimumLogLevel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -301,6 +308,7 @@
 			files = (
 				AA000000000000000000B014 /* LogParserTests.swift in Sources */,
 				AA000000000000000000B015 /* PersistenceControllerTests.swift in Sources */,
+				AA000000000000000000B022 /* StoredLogEntryFilterTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

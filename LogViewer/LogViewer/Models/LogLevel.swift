@@ -32,7 +32,7 @@ enum LogLevel: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
-    var sortOrder: Int {
+    var sortOrder: Int16 {
         switch self {
         case .verbose:  0
         case .debug:    1

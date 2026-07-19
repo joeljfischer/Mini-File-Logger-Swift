@@ -10,6 +10,6 @@ struct LogEntry: Identifiable, Equatable, Sendable {
     let message: String
     let rawLine: String
 
-    var levelSortOrder: Int { level?.sortOrder ?? -1 }
+    var levelSortOrder: Int { Int(level?.sortOrder ?? -1) }
     var timestampForSort: Date { timestamp ?? .distantPast }
 }

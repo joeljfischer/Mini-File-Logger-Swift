@@ -16,4 +16,25 @@ final class StoredLogEntry: NSManagedObject {
     @nonobjc class func fetchRequest() -> NSFetchRequest<StoredLogEntry> {
         NSFetchRequest(entityName: "StoredLogEntry")
     }
+
+    static func filteredFetchRequest(
+        searchText: String,
+        minimumLevel: MinimumLogLevel
+    ) -> NSFetchRequest<StoredLogEntry> {
+        let request = fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: "lineNumber", ascending: true)]
+        request.fetchBatchSize = 200
+        var predicates: [NSPredicate] = []
+        if !searchText.isEmpty {
+            predicates.append(NSPredicate(format: "rawLine CONTAINS[cd] %@", searchText))
+        }
+        if let level = minimumLevel.level {
+            predicates.append(NSPredicate(format: "levelRank >= %d", level.sortOrder))
+        }
+        request.predicate = predicates.isEmpty
+            ? nil
+            : NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
+
+        return request
+    }
 }
