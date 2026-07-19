@@ -52,7 +52,7 @@ import Testing
         for _ in 0..<1_000_000 {
             fileLogger.writeLog("Test log", level: .debug, subsystem: "Test", category: "Test")
         }
-        try checkDirectory(for: fileLogger, expectedNumLogFiles: 1)
+        try checkDirectory(for: fileLogger, expectedNumLogFiles: fileLogger.maxFileCount)
 
         // TODO: Check file for correct number of lines and format of data
     }

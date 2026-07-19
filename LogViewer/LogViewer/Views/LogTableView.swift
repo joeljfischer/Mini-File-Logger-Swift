@@ -101,6 +101,7 @@ struct LogTableView: View {
             Group {
                 if let selectedEntry {
                     LogDetailView(entry: selectedEntry)
+                        .id(selectedEntry.objectID)
                 } else {
                     Color.clear
                 }
