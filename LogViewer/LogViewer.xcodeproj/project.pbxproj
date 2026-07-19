@@ -18,6 +18,7 @@
 		AA000000000000000000B011 /* LogTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F011 /* LogTableView.swift */; };
 		AA000000000000000000B012 /* LogDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F012 /* LogDetailView.swift */; };
 		AA000000000000000000B013 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F013 /* Assets.xcassets */; };
+		AA000000000000000000B014 /* LogParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000F014 /* LogParserTests.swift */; };
 		AA000000000000000000B0FF /* MiniFileLogger in Frameworks */ = {isa = PBXBuildFile; productRef = AA000000000000000000E00D /* MiniFileLogger */; };
 /* End PBXBuildFile section */
 
@@ -34,6 +35,8 @@
 		AA000000000000000000F011 /* LogTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogTableView.swift; sourceTree = "<group>"; };
 		AA000000000000000000F012 /* LogDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogDetailView.swift; sourceTree = "<group>"; };
 		AA000000000000000000F013 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AA000000000000000000F014 /* LogParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogParserTests.swift; sourceTree = "<group>"; };
+		AA000000000000000000F015 /* LogViewerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LogViewerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,6 +48,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AA000000000000000000E010 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -52,6 +62,7 @@
 			isa = PBXGroup;
 			children = (
 				AA000000000000000000C002 /* LogViewer */,
+				AA000000000000000000C005 /* LogViewerTests */,
 				AA000000000000000000C001 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -60,8 +71,17 @@
 			isa = PBXGroup;
 			children = (
 				AA000000000000000000F001 /* LogViewer.app */,
+				AA000000000000000000F015 /* LogViewerTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		AA000000000000000000C005 /* LogViewerTests */ = {
+			isa = PBXGroup;
+			children = (
+				AA000000000000000000F014 /* LogParserTests.swift */,
+			);
+			path = LogViewerTests;
 			sourceTree = "<group>";
 		};
 		AA000000000000000000C002 /* LogViewer */ = {
@@ -129,7 +149,45 @@
 			productReference = AA000000000000000000F001 /* LogViewer.app */;
 			productType = "com.apple.product-type.application";
 		};
+		AA000000000000000000E00E /* LogViewerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA000000000000000000E016 /* Build configuration list for PBXNativeTarget "LogViewerTests" */;
+			buildPhases = (
+				AA000000000000000000E00F /* Sources */,
+				AA000000000000000000E010 /* Frameworks */,
+				AA000000000000000000E011 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AA000000000000000000E013 /* PBXTargetDependency */,
+			);
+			name = LogViewerTests;
+			packageProductDependencies = (
+			);
+			productName = LogViewerTests;
+			productReference = AA000000000000000000F015 /* LogViewerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
+
+/* Begin PBXContainerItemProxy section */
+		AA000000000000000000E012 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA000000000000000000E001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA000000000000000000E002;
+			remoteInfo = LogViewer;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXTargetDependency section */
+		AA000000000000000000E013 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA000000000000000000E002 /* LogViewer */;
+			targetProxy = AA000000000000000000E012 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXProject section */
 		AA000000000000000000E001 /* Project object */ = {
@@ -141,6 +199,10 @@
 				TargetAttributes = {
 					AA000000000000000000E002 = {
 						CreatedOnToolsVersion = 15.4;
+					};
+					AA000000000000000000E00E = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = AA000000000000000000E002;
 					};
 				};
 			};
@@ -161,6 +223,7 @@
 			projectRoot = "";
 			targets = (
 				AA000000000000000000E002 /* LogViewer */,
+				AA000000000000000000E00E /* LogViewerTests */,
 			);
 		};
 /* End PBXProject section */
@@ -171,6 +234,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA000000000000000000B013 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA000000000000000000E011 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -191,6 +261,14 @@
 				AA000000000000000000B010 /* FilterBar.swift in Sources */,
 				AA000000000000000000B011 /* LogTableView.swift in Sources */,
 				AA000000000000000000B012 /* LogDetailView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA000000000000000000E00F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA000000000000000000B014 /* LogParserTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -360,6 +438,32 @@
 			};
 			name = Release;
 		};
+		AA000000000000000000E014 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.joelfischer.LogViewerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LogViewer.app/Contents/MacOS/LogViewer";
+			};
+			name = Debug;
+		};
+		AA000000000000000000E015 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.joelfischer.LogViewerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LogViewer.app/Contents/MacOS/LogViewer";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -377,6 +481,15 @@
 			buildConfigurations = (
 				AA000000000000000000E00A /* Debug */,
 				AA000000000000000000E00B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA000000000000000000E016 /* Build configuration list for PBXNativeTarget "LogViewerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA000000000000000000E014 /* Debug */,
+				AA000000000000000000E015 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

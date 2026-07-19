@@ -6,27 +6,19 @@ struct LogParser {
     // Example: INF [com.app|networking] (2024-01-01T12:00:00Z): Connected
     nonisolated(unsafe) private static let linePattern = /^(\w+) \[([^|]+)\|([^\]]+)\] \(([^)]+)\): (.+)$/
 
-    nonisolated(unsafe) private static let iso8601WithFractional: ISO8601DateFormatter = {
-        let f = ISO8601DateFormatter()
-        f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        return f
-    }()
-
-    nonisolated(unsafe) private static let iso8601Basic: ISO8601DateFormatter = {
-        let f = ISO8601DateFormatter()
-        f.formatOptions = [.withInternetDateTime]
-        return f
-    }()
-
     static func parse(fileContents: String) -> [LogEntry] {
         parseLines(fileContents, startingLineNumber: 1)
     }
 
     static func parseLines(_ text: String, startingLineNumber: Int) -> [LogEntry] {
         var results: [LogEntry] = []
-        let lines = text.components(separatedBy: "\n")
-        var lineNumber = startingLineNumber
-        for line in lines {
+        let iso8601WithFractional = ISO8601DateFormatter()
+        iso8601WithFractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let iso8601Basic = ISO8601DateFormatter()
+        iso8601Basic.formatOptions = [.withInternetDateTime]
+
+        for (offset, line) in text.components(separatedBy: "\n").enumerated() {
+            let lineNumber = startingLineNumber + offset
             if line.trimmingCharacters(in: .whitespaces).isEmpty { continue }
             if let m = try? linePattern.wholeMatch(in: line) {
                 let level = LogLevel(rawValue: String(m.1))
@@ -51,7 +43,6 @@ struct LogParser {
                                         subsystem: "", category: "", timestamp: nil,
                                         message: line, rawLine: line))
             }
-            lineNumber += 1
         }
         return results
     }
