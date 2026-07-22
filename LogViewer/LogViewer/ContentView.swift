@@ -87,6 +87,7 @@ struct ContentView: View {
                     Button("Open Log File", systemImage: "folder") {
                         state.presentImporter()
                     }
+                    .accessibilityIdentifier("openLogFileButton")
                 }
             }
 
@@ -97,6 +98,7 @@ struct ContentView: View {
                     }
                 }
                 .pickerStyle(.menu)
+                .accessibilityIdentifier("minimumLogLevelPicker")
             }
         }
         .searchable(

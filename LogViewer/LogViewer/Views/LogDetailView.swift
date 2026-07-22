@@ -13,6 +13,7 @@ struct LogDetailView: View {
                 HStack(alignment: .center) {
                     if let level {
                         Text(level.rawValue)
+                            .accessibilityIdentifier("detailLevelCode")
                             .font(.system(.caption, design: .monospaced, weight: .bold))
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
@@ -43,29 +44,55 @@ struct LogDetailView: View {
                 Divider()
 
                 Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 6) {
-                    detailRow(title: "Subsystem", value: entry.subsystem)
-                    detailRow(title: "Category", value: entry.category)
-                    detailRow(title: "Line", value: entry.lineNumber.formatted())
+                    detailRow(
+                        title: "Subsystem",
+                        value: entry.subsystem,
+                        identifier: "detailSubsystem"
+                    )
+                    detailRow(
+                        title: "Category",
+                        value: entry.category,
+                        identifier: "detailCategory"
+                    )
+                    detailRow(
+                        title: "Line",
+                        value: entry.lineNumber.formatted(),
+                        identifier: "detailLine"
+                    )
                 }
 
                 Divider()
 
-                detailSection(title: "Message", value: entry.message)
+                detailSection(
+                    title: "Message",
+                    value: entry.message,
+                    identifier: "detailMessage"
+                )
 
                 Divider()
 
-                detailSection(title: "Raw Line", value: entry.rawLine, isSecondary: true)
+                detailSection(
+                    title: "Raw Line",
+                    value: entry.rawLine,
+                    identifier: "detailRawLine",
+                    isSecondary: true
+                )
             }
             .padding()
         }
     }
 
-    private func detailRow(title: String, value: String) -> some View {
+    private func detailRow(
+        title: String,
+        value: String,
+        identifier: String
+    ) -> some View {
         GridRow {
             Text(title)
                 .font(.caption)
                 .foregroundStyle(.secondary)
             Text(value.isEmpty ? "—" : value)
+                .accessibilityIdentifier(identifier)
                 .font(.caption.monospaced())
                 .textSelection(.enabled)
         }
@@ -74,6 +101,7 @@ struct LogDetailView: View {
     private func detailSection(
         title: String,
         value: String,
+        identifier: String,
         isSecondary: Bool = false
     ) -> some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -81,6 +109,7 @@ struct LogDetailView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
             Text(value)
+                .accessibilityIdentifier(identifier)
                 .font((isSecondary ? Font.caption : Font.body).monospaced())
                 .foregroundStyle(isSecondary ? .secondary : .primary)
                 .textSelection(.enabled)

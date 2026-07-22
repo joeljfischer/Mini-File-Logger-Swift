@@ -72,6 +72,9 @@ struct LogTableView: View {
             Table(of: LogTableRow.self, selection: tableSelection) {
                 TableColumn("Level") { row in
                     Text(levelText(for: row.entry))
+                        .accessibilityIdentifier(
+                            "logRowLevel-\(row.entry.lineNumber)"
+                        )
                 }
                 .width(min: 70, ideal: 90, max: 120)
 
@@ -96,6 +99,7 @@ struct LogTableView: View {
                     TableRow(LogTableRow(entry: entry))
                 }
             }
+            .accessibilityIdentifier("logTable")
             .frame(minHeight: 220)
 
             Group {
