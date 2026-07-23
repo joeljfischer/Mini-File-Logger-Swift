@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="26100" systemVersion="25A5316i" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="NO" userDefinedModelVersionIdentifier="">
+    <entity name="LogSession" representedClassName="LogSession" syncable="YES">
+        <attribute name="fileName" attributeType="String"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="importedAt" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="entries" toMany="YES" deletionRule="Cascade" destinationEntity="StoredLogEntry" inverseName="session" inverseEntity="StoredLogEntry"/>
+    </entity>
+    <entity name="StoredLogEntry" representedClassName="StoredLogEntry" syncable="YES">
+        <attribute name="category" attributeType="String"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="levelCode" optional="YES" attributeType="String"/>
+        <attribute name="levelRank" attributeType="Integer 16" defaultValueString="-1" usesScalarValueType="YES"/>
+        <attribute name="lineNumber" attributeType="Integer 64" usesScalarValueType="YES"/>
+        <attribute name="message" attributeType="String"/>
+        <attribute name="rawLine" attributeType="String"/>
+        <relationship name="session" maxCount="1" deletionRule="Nullify" destinationEntity="LogSession" inverseName="entries" inverseEntity="LogSession"/>
+        <attribute name="subsystem" attributeType="String"/>
+        <attribute name="timestamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+    </entity>
+    <elements>
+        <element name="LogSession" positionX="-63" positionY="-18" width="128" height="104"/>
+        <element name="StoredLogEntry" positionX="171" positionY="-18" width="128" height="209"/>
+    </elements>
+</model>
